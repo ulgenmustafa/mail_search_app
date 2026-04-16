@@ -1,18 +1,47 @@
+import tkinter as tk
 from search import search
+import indexer
 
-while True:
-    print("\n--- MAIL ARAMA ---")
-    query = input("Aramak istediğin kelime: ")
-
+def do_search():
+    query = entry.get()
     results = search(query)
 
+    text.delete(1.0, tk.END)
+
     if not results:
-        print("Sonuç bulunamadı\n")
-        continue
+        text.insert(tk.END, "Sonuç bulunamadı\n")
+        return
 
     for r in results:
-        print("\nDosya:", r[0])
-        print("Gönderen:", r[1])
-        print("Tarih:", r[2])
-        print("Konu:", r[3])
-        print("-" * 40)
+        text.insert(tk.END, f"Dosya: {r[0]}\n")
+        text.insert(tk.END, f"Gönderen: {r[1]}\n")
+        text.insert(tk.END, f"Tarih: {r[2]}\n")
+        text.insert(tk.END, f"Konu: {r[3]}\n")
+        text.insert(tk.END, "-"*40 + "\n")
+
+
+def update_database():
+    text.delete(1.0, tk.END)
+    text.insert(tk.END, "Veritabanı güncelleniyor...\n")
+
+    indexer.index_folder("data")
+
+    text.insert(tk.END, "Bitti!\n")
+
+
+root = tk.Tk()
+root.title("Mail Arama Sistemi")
+
+entry = tk.Entry(root, width=50)
+entry.pack(pady=10)
+
+search_btn = tk.Button(root, text="Ara", command=do_search)
+search_btn.pack()
+
+update_btn = tk.Button(root, text="Veritabanını Güncelle", command=update_database)
+update_btn.pack(pady=5)
+
+text = tk.Text(root, width=80, height=25)
+text.pack()
+
+root.mainloop()
